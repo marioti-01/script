@@ -1,0 +1,62 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+int read_config() {
+    FILE *file = fopen("config.txt", "r");
+    if (file == NULL) {
+        perror("Erro ao abrir config.txt");
+        return -1;
+    }
+    
+    int num = -1;
+    char line[50];
+    while (fgets(line, sizeof(line), file)) {
+        if (strncmp(line, "num=", 4) == 0) {
+            num = atoi(line + 4);
+            break;
+        }
+    }
+    
+    fclose(file);
+    return num;
+}
+
+int main(int argc, char *argv[]) {
+    int num_required = read_config();
+    if (num_required == -1) {
+        printf("Erro: parâmetro 'num' não encontrado no config.txt\n");
+        return 1;
+    }
+    
+    if (argc - 1 != num_required) {
+        printf("Erro: O programa requer exatamente %d arquivos como parâmetro.\n", num_required);
+        return 1;
+    }
+    
+    FILE *output = fopen("resultado.txt", "w");
+    if (output == NULL) {
+        perror("Erro ao criar resultado.txt");
+        return 1;
+    }
+    
+    for (int i = 1; i < argc; i++) {
+        FILE *input = fopen(argv[i], "r");
+        if (input == NULL) {
+            perror("Erro ao abrir um dos arquivos");
+            fclose(output);
+            return 1;
+        }
+        
+        char buffer[1024];
+        while (fgets(buffer, sizeof(buffer), input)) {
+            fputs(buffer, output);
+        }
+        
+        fclose(input);
+    }
+    
+    fclose(output);
+    printf("Conteúdo dos arquivos mesclado em resultado.txt\n");
+    return 0;
+}
