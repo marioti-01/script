@@ -1,0 +1,23 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+int main(int argc, char *argv[]) {
+    if (argc < 3) {
+        printf("Uso: %s <arquivo> <param1> <param2> ...\n", argv[0]);
+        return 1;
+    }
+    
+    FILE *file = fopen(argv[1], "w");
+    if (file == NULL) {
+        perror("Erro ao abrir o arquivo");
+        return 1;
+    }
+    
+    for (int i = 2; i < argc; i++) {
+        fprintf(file, "%s\n", argv[i]);
+    }
+    
+    fclose(file);
+    printf("Parâmetros escritos em %s\n", argv[1]);
+    return 0;
+}
