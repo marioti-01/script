@@ -1,0 +1,36 @@
+import sys
+
+def read_config():
+    try:
+        with open("config.txt", "r") as file:
+            for line in file:
+                if line.startswith("num="):
+                    return int(line.split("=")[1].strip())
+    except FileNotFoundError:
+        print("Erro ao abrir config.txt")
+        sys.exit(1)
+    return None
+
+if __name__ == "__main__":
+    num_required = read_config()
+    if num_required is None:
+        print("Erro: parâmetro 'num' não encontrado no config.txt")
+        sys.exit(1)
+    
+    if len(sys.argv) - 1 != num_required:
+        print(f"Erro: O programa requer exatamente {num_required} arquivos como parâmetro.")
+        sys.exit(1)
+    
+    try:
+        with open("resultado.txt", "w") as output:
+            for filename in sys.argv[1:]:
+                try:
+                    with open(filename, "r") as input_file:
+                        output.write(input_file.read())
+                except FileNotFoundError:
+                    print(f"Erro ao abrir o arquivo {filename}")
+                    sys.exit(1)
+        print("Conteúdo dos arquivos mesclado em resultado.txt")
+    except Exception as e:
+        print(f"Erro ao criar resultado.txt: {e}")
+        sys.exit(1)
